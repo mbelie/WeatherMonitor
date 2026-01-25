@@ -1,0 +1,55 @@
+graph TB
+    subgraph "Edge Devices"
+        RPi1[Raspberry Pi 1<br/>Temperature Sensor]
+        RPi2[Raspberry Pi 2<br/>Temperature Sensor]
+        RPi3[Raspberry Pi 3<br/>Temperature Sensor]
+        RPiN[Raspberry Pi N<br/>Temperature Sensor]
+    end
+    
+    subgraph "AWS Cloud"
+        SNS[SNS Topic<br/>temperature-data]
+        
+        subgraph "Data Processing Lambda"
+            Lambda1[Lambda Function<br/>Data Processor]
+            CW[CloudWatch Logs<br/>Print Statements]
+            DD[DataDog API<br/>External Logging]
+            DDB[(DynamoDB Table<br/>Device Weather Data)]
+        end
+        
+        subgraph "Notification Lambda"
+            Lambda2[Lambda Function<br/>Notification Service]
+            SES[SES<br/>Email Notifications]
+            SMS[SNS SMS<br/>Text Notifications]
+        end
+    end
+    
+    subgraph "Recipients"
+        Family[Family Members]
+    end
+    
+    RPi1 -->|Publish Temperature Data| SNS
+    RPi2 -->|Publish Temperature Data| SNS
+    RPi3 -->|Publish Temperature Data| SNS
+    RPiN -->|Publish Temperature Data| SNS
+    
+    SNS -->|Trigger| Lambda1
+    SNS -->|Trigger| Lambda2
+    
+    Lambda1 -->|Log via Print| CW
+    Lambda1 -->|POST Request| DD
+    Lambda1 -->|Insert Records| DDB
+    
+    Lambda2 -->|Send Emails| SES
+    Lambda2 -->|Send SMS| SMS
+    
+    SES -->|Email| Family
+    SMS -->|Text Message| Family
+    
+    style SNS fill:#FF9900
+    style Lambda1 fill:#FF9900
+    style Lambda2 fill:#FF9900
+    style DDB fill:#4053D6
+    style CW fill:#FF4F8B
+    style SES fill:#DD344C
+    style SMS fill:#FF9900
+    style DD fill:#632CA6
