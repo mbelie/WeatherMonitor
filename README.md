@@ -2,7 +2,7 @@
 This a hobby project utilizing Raspberry Pi based temperature sensors around my home to capture weather data and commit it to an AWS SNS topic for storage in DynamoDB, alerting via SMS/SES and display in an web dashboard hosted in AWS Amplify.
 
 # Architecture
-- TBD
+![Architecture](/docs/architecture.png)
 
 # Repo Structure
 
