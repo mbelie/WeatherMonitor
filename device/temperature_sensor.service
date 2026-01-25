@@ -1,0 +1,16 @@
+[Unit]
+Description=DHT11 Temperature and Humidity Sensor Reader
+After=network.target
+
+[Service]
+Type=simple
+User=mbelie
+WorkingDirectory=/home/mbelie
+ExecStart=/home/mbelie/projects/temperarture-sensor/bin/python3 /home/mbelie/projects/temperarture-sensor/main.py
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

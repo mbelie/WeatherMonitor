@@ -1,0 +1,30 @@
+import urllib.request
+import json
+import os
+
+from device.sensor_result import SensorResult
+
+class WeatherService:
+    DEFAULT_LATITUDE = 33.28977940
+    DEFAULT_LONGITUDE = -96.55522600
+    WEATHER_API_METRICS = '&current=temperature_2m,relative_humidity_2m,surface_pressure&temperature_unit=fahrenheit'
+    CURRENT_KEY = "current"
+    TEMPERATURE_KEY = "temperature_2m"
+    HUMIDITY_KEY = "relative_humidity_2m"
+    PRESSURE_KEY = "surface_pressure"
+    
+    def __init__(self):
+        self.WEATHER_API_URL = f"https://api.open-meteo.com/v1/forecast?latitude={os.getenv('LATITUDE', self.DEFAULT_LATITUDE)}&longitude={os.getenv('LONGITUDE', self.DEFAULT_LONGITUDE)}{self.WEATHER_API_METRICS}"
+
+    def fetch_conditions(self):
+        try:
+            with urllib.request.urlopen(self.WEATHER_API_URL) as response:
+                data = json.loads(response.read().decode())
+                
+                temperature = data[f'{CURRENT_KEY}'][f'{TEMPERATURE_KEY}']
+                humidity = data[f'{CURRENT_KEY}'][f'{HUMIDITY_KEY}']
+                pressure = data[f'{CURRENT_KEY}'][f'{PRESSURE_KEY}']
+
+                return SensorResult(temperature=temperature, humidity=humidity, pressure=pressure, errorMessage=None)
+        except Exception as error:
+            return SensorResult(None, None, None, f"Error fetching weather data: {error}")
