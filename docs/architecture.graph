@@ -18,3 +18,48 @@ graph TB
             CW[CloudWatch Logs<br/>Print Statements]
             DD[DataDog API<br/>External Logging]
             DDB[(DynamoDB Table<br/>Device Weather Data)]
+        end
+        
+        subgraph Notification["Notification Lambda"]
+            LAMBDA2[Lambda Function 2]
+            SES[SES<br/>Email Service]
+            SNS_SMS[SNS<br/>SMS Service]
+        end
+    end
+
+    subgraph Recipients["Recipients"]
+        FAMILY[Family Members<br/>Email/SMS]
+    end
+
+    BFM -.->|Deploy Software| RPI1
+    BFM -.->|Deploy Software| RPI2
+    BFM -.->|Deploy Software| RPI3
+    BFM -.->|Deploy Software| RPI4
+
+    RPI1 -->|Temperature Data| SNS
+    RPI2 -->|Temperature Data| SNS
+    RPI3 -->|Temperature Data| SNS
+    RPI4 -->|Temperature Data| SNS
+
+    SNS -->|Trigger| LAMBDA1
+    SNS -->|Trigger| LAMBDA2
+
+    LAMBDA1 -->|Log via print| CW
+    LAMBDA1 -->|Send metrics| DD
+    LAMBDA1 -->|Insert data| DDB
+
+    LAMBDA2 -->|Send email| SES
+    LAMBDA2 -->|Send SMS| SNS_SMS
+
+    SES -->|Email notifications| FAMILY
+    SNS_SMS -->|SMS notifications| FAMILY
+
+    style SNS fill:#ff9900
+    style LAMBDA1 fill:#ff9900
+    style LAMBDA2 fill:#ff9900
+    style CW fill:#ff9900
+    style DDB fill:#ff9900
+    style SES fill:#ff9900
+    style SNS_SMS fill:#ff9900
+    style BFM fill:#00a98f
+    style DD fill:#632ca6
