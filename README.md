@@ -11,7 +11,7 @@ This a hobby project utilizing Raspberry Pi based temperature sensors around my 
 
 - Contains all cloud related code
 
-### dashbord
+### dashboard
 
 - Contains a GUI application for viewing device status and historical temperature data
 - Expect this to be a Flutter or Angular web application
