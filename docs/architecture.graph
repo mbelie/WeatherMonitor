@@ -1,67 +1,72 @@
 graph TB
-    subgraph Edge["Edge Devices"]
+    subgraph Devices["Edge Devices"]
         RPI1[Raspberry Pi 1]
         RPI2[Raspberry Pi 2]
         RPI3[Raspberry Pi 3]
         RPI4[Raspberry Pi ...]
         Balena[Balena Fleet Management]
+        
+        Balena -.->|Deploys Software| RPI1
+        Balena -.->|Deploys Software| RPI2
+        Balena -.->|Deploys Software| RPI3
+        Balena -.->|Deploys Software| RPI4
     end
-
+    
     subgraph AWS["AWS Cloud"]
         SNS[SNS Topic<br/>temperature-data]
         
-        subgraph Processing["Data Processing"]
-            Lambda1[Lambda Function 1<br/>Data Logger & Storage]
-            CW[CloudWatch Logs]
-            DD[DataDog API]
-            DDB[(DynamoDB Table<br/>Temperature Data)]
+        subgraph Processing["Processing Layer"]
+            Lambda1[Lambda Function 1<br/>Data Processing]
+            Lambda2[Lambda Function 2<br/>Notification Service]
         end
         
-        subgraph Notifications["Notification Service"]
-            Lambda2[Lambda Function 2<br/>Alert Service]
-            SES[Amazon SES<br/>Email Service]
-            SNS2[Amazon SNS<br/>SMS Service]
+        subgraph Storage["Storage & Logging"]
+            CW[CloudWatch Logs]
+            DDB[(DynamoDB<br/>Temperature Data)]
+        end
+        
+        subgraph Notification["Notification Services"]
+            SES[Amazon SES<br/>Email]
+            SNS2[Amazon SNS<br/>SMS]
+        end
+        
+        subgraph Frontend["Frontend Hosting"]
+            Amplify[AWS Amplify<br/>Angular Dashboard]
         end
     end
-
-    subgraph Frontend["User Interface"]
-        Angular[Angular Dashboard]
-        Users[Family Members]
+    
+    subgraph External["External Services"]
+        DataDog[DataDog API]
+        Users[Family Members<br/>Email/SMS]
+        WebUsers[Dashboard Users]
     end
-
-    Balena -.->|Deploy Software| RPI1
-    Balena -.->|Deploy Software| RPI2
-    Balena -.->|Deploy Software| RPI3
-    Balena -.->|Deploy Software| RPI4
-
-    RPI1 -->|Publish Temperature Data| SNS
-    RPI2 -->|Publish Temperature Data| SNS
-    RPI3 -->|Publish Temperature Data| SNS
-    RPI4 -->|Publish Temperature Data| SNS
-
-    SNS -->|Trigger| Lambda1
-    SNS -->|Trigger| Lambda2
-
-    Lambda1 -->|Log via print| CW
-    Lambda1 -->|Send Metrics| DD
-    Lambda1 -->|Insert Data| DDB
-
-    Lambda2 -->|Send Emails| SES
+    
+    RPI1 -->|Temperature Data| SNS
+    RPI2 -->|Temperature Data| SNS
+    RPI3 -->|Temperature Data| SNS
+    RPI4 -->|Temperature Data| SNS
+    
+    SNS -->|Triggers| Lambda1
+    SNS -->|Triggers| Lambda2
+    
+    Lambda1 -->|Print Statements| CW
+    Lambda1 -->|Log Payload| DataDog
+    Lambda1 -->|Insert Device Data| DDB
+    
+    Lambda2 -->|Send Email| SES
     Lambda2 -->|Send SMS| SNS2
-
-    SES -->|Email Alerts| Users
-    SNS2 -->|SMS Alerts| Users
-
-    DDB -->|Query Data| Angular
-    Angular -->|Display Dashboard| Users
-
-    style SNS fill:#ff9900
-    style Lambda1 fill:#ff9900
-    style Lambda2 fill:#ff9900
-    style DDB fill:#ff9900
-    style SES fill:#ff9900
-    style SNS2 fill:#ff9900
-    style CW fill:#ff9900
-    style Balena fill:#00a99d
-    style Angular fill:#dd0031
-    style DD fill:#632ca6
+    
+    SES -->|Email Notifications| Users
+    SNS2 -->|SMS Notifications| Users
+    
+    DDB -->|Read Temperature Data| Amplify
+    Amplify -->|Displays Dashboard| WebUsers
+    
+    style AWS fill:#FF9900,stroke:#232F3E,stroke-width:3px,color:#fff
+    style Devices fill:#E8F5E9,stroke:#4CAF50,stroke-width:2px
+    style External fill:#FFF3E0,stroke:#FF9800,stroke-width:2px
+    style SNS fill:#FF4081,stroke:#C51162,stroke-width:2px,color:#fff
+    style Lambda1 fill:#FF9900,stroke:#FF6F00,stroke-width:2px
+    style Lambda2 fill:#FF9900,stroke:#FF6F00,stroke-width:2px
+    style DataDog fill:#632CA6,stroke:#4B2082,stroke-width:2px,color:#fff
+    style Balena fill:#F7DC6F,stroke:#D4AC0D,stroke-width:2px
