@@ -1,65 +1,67 @@
 graph TB
-    subgraph Devices["Edge Devices"]
-        RPI1[Raspberry Pi 1<br/>Temperature Sensor]
-        RPI2[Raspberry Pi 2<br/>Temperature Sensor]
-        RPI3[Raspberry Pi 3<br/>Temperature Sensor]
-        RPI4[Raspberry Pi N<br/>Temperature Sensor]
-    end
-
-    subgraph Balena["Balena Fleet Management"]
-        BFM[Balena Platform<br/>Software Deployment]
+    subgraph Edge["Edge Devices"]
+        RPI1[Raspberry Pi 1]
+        RPI2[Raspberry Pi 2]
+        RPI3[Raspberry Pi 3]
+        RPI4[Raspberry Pi ...]
+        Balena[Balena Fleet Management]
     end
 
     subgraph AWS["AWS Cloud"]
         SNS[SNS Topic<br/>temperature-data]
         
-        subgraph Processing["Data Processing Lambda"]
-            LAMBDA1[Lambda Function 1]
-            CW[CloudWatch Logs<br/>Print Statements]
-            DD[DataDog API<br/>External Logging]
-            DDB[(DynamoDB Table<br/>Device Weather Data)]
+        subgraph Processing["Data Processing"]
+            Lambda1[Lambda Function 1<br/>Data Logger & Storage]
+            CW[CloudWatch Logs]
+            DD[DataDog API]
+            DDB[(DynamoDB Table<br/>Temperature Data)]
         end
         
-        subgraph Notification["Notification Lambda"]
-            LAMBDA2[Lambda Function 2]
-            SES[SES<br/>Email Service]
-            SNS_SMS[SNS<br/>SMS Service]
+        subgraph Notifications["Notification Service"]
+            Lambda2[Lambda Function 2<br/>Alert Service]
+            SES[Amazon SES<br/>Email Service]
+            SNS2[Amazon SNS<br/>SMS Service]
         end
     end
 
-    subgraph Recipients["Recipients"]
-        FAMILY[Family Members<br/>Email/SMS]
+    subgraph Frontend["User Interface"]
+        Angular[Angular Dashboard]
+        Users[Family Members]
     end
 
-    BFM -.->|Deploy Software| RPI1
-    BFM -.->|Deploy Software| RPI2
-    BFM -.->|Deploy Software| RPI3
-    BFM -.->|Deploy Software| RPI4
+    Balena -.->|Deploy Software| RPI1
+    Balena -.->|Deploy Software| RPI2
+    Balena -.->|Deploy Software| RPI3
+    Balena -.->|Deploy Software| RPI4
 
-    RPI1 -->|Temperature Data| SNS
-    RPI2 -->|Temperature Data| SNS
-    RPI3 -->|Temperature Data| SNS
-    RPI4 -->|Temperature Data| SNS
+    RPI1 -->|Publish Temperature Data| SNS
+    RPI2 -->|Publish Temperature Data| SNS
+    RPI3 -->|Publish Temperature Data| SNS
+    RPI4 -->|Publish Temperature Data| SNS
 
-    SNS -->|Trigger| LAMBDA1
-    SNS -->|Trigger| LAMBDA2
+    SNS -->|Trigger| Lambda1
+    SNS -->|Trigger| Lambda2
 
-    LAMBDA1 -->|Log via print| CW
-    LAMBDA1 -->|Send metrics| DD
-    LAMBDA1 -->|Insert data| DDB
+    Lambda1 -->|Log via print| CW
+    Lambda1 -->|Send Metrics| DD
+    Lambda1 -->|Insert Data| DDB
 
-    LAMBDA2 -->|Send email| SES
-    LAMBDA2 -->|Send SMS| SNS_SMS
+    Lambda2 -->|Send Emails| SES
+    Lambda2 -->|Send SMS| SNS2
 
-    SES -->|Email notifications| FAMILY
-    SNS_SMS -->|SMS notifications| FAMILY
+    SES -->|Email Alerts| Users
+    SNS2 -->|SMS Alerts| Users
+
+    DDB -->|Query Data| Angular
+    Angular -->|Display Dashboard| Users
 
     style SNS fill:#ff9900
-    style LAMBDA1 fill:#ff9900
-    style LAMBDA2 fill:#ff9900
-    style CW fill:#ff9900
+    style Lambda1 fill:#ff9900
+    style Lambda2 fill:#ff9900
     style DDB fill:#ff9900
     style SES fill:#ff9900
-    style SNS_SMS fill:#ff9900
-    style BFM fill:#00a98f
+    style SNS2 fill:#ff9900
+    style CW fill:#ff9900
+    style Balena fill:#00a99d
+    style Angular fill:#dd0031
     style DD fill:#632ca6
