@@ -2,7 +2,7 @@ import urllib.request
 import json
 import os
 
-from device.sensor_result import SensorResult
+from sensor_result import SensorResult
 
 class WeatherService:
     DEFAULT_LATITUDE = 33.28977940
@@ -20,10 +20,10 @@ class WeatherService:
         try:
             with urllib.request.urlopen(self.WEATHER_API_URL) as response:
                 data = json.loads(response.read().decode())
-                
-                temperature = data[f'{CURRENT_KEY}'][f'{TEMPERATURE_KEY}']
-                humidity = data[f'{CURRENT_KEY}'][f'{HUMIDITY_KEY}']
-                pressure = data[f'{CURRENT_KEY}'][f'{PRESSURE_KEY}']
+
+                temperature = float(data[f'{self.CURRENT_KEY}'][f'{self.TEMPERATURE_KEY}'])
+                humidity = float(data[f'{self.CURRENT_KEY}'][f'{self.HUMIDITY_KEY}'])
+                pressure = float(data[f'{self.CURRENT_KEY}'][f'{self.PRESSURE_KEY}'])
 
                 return SensorResult(temperature=temperature, humidity=humidity, pressure=pressure, errorMessage=None)
         except Exception as error:

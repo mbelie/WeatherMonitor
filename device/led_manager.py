@@ -4,14 +4,14 @@
 import unicornhat as unicorn
 
 class LedManager:
-    def initialize():
+    def initialize(self):
         unicorn.set_layout(unicorn.AUTO)
         unicorn.rotation(0)
         unicorn.brightness(0.5)
         unicorn.clear()
         unicorn.show()
 
-    def set_color(r, g, b):
+    def set_color(self, r, g, b):
         width, height = unicorn.get_shape()
         for x in range(width):
             for y in range(height):
