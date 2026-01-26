@@ -16,7 +16,7 @@ weatherDataPublisher = WeatherDataPublisher()
 
 #  Old DHT11 sensors?
 CALIBRATION_OFFSET_F = 35.0
-SLEEP_SECONDS = 60
+SLEEP_SECONDS = 30
 
 # Future use (multitenancy)
 USER_ID = "e0d5b845-35be-4c25-8b6d-0097664387e2"
@@ -51,7 +51,7 @@ def main():
             else:
                 sensorResult = weatherService.fetch_conditions()
                 temperature_f = sensorResult.temperature
-    
+
             if sensorResult.errorMessage is None:
                 print(f"Temperature: {temperature_f:.1f} F  Humidity: {sensorResult.humidity:.1f}%")
 
@@ -68,12 +68,12 @@ def main():
 
                 weatherDataPublisher.publish(json.dumps(payload))
             else:
-                
                 print(f"Error: {sensorResult.errorMessage}")
                 if not sensorResult.isRecoverable:
                     temperatureSensor.dispose()
                     raise SystemExit("Unrecoverable error encountered. Exiting.")
 
+            print(f"Sleeping {SLEEP_SECONDS}s...")
             time.sleep(SLEEP_SECONDS)
     except KeyboardInterrupt:
         print("\nExiting program...")

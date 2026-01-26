@@ -12,6 +12,7 @@ class LedManager:
         unicorn.show()
 
     def set_color(self, r, g, b):
+        print(f"Setting LED color to R:{r} G:{g} B:{b}")
         width, height = unicorn.get_shape()
         for x in range(width):
             for y in range(height):

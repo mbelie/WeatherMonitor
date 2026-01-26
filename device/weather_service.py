@@ -19,12 +19,12 @@ class WeatherService:
     def fetch_conditions(self):
         try:
             with urllib.request.urlopen(self.WEATHER_API_URL) as response:
-                data = json.loads(response.read().decode())
+                jsonValue=response.read().decode()
+                data = json.loads(jsonValue)
 
                 temperature = float(data[f'{self.CURRENT_KEY}'][f'{self.TEMPERATURE_KEY}'])
                 humidity = float(data[f'{self.CURRENT_KEY}'][f'{self.HUMIDITY_KEY}'])
                 pressure = float(data[f'{self.CURRENT_KEY}'][f'{self.PRESSURE_KEY}'])
-
                 return SensorResult(temperature=temperature, humidity=humidity, pressure=pressure, errorMessage=None)
         except Exception as error:
             return SensorResult(None, None, None, f"Error fetching weather data: {error}")
