@@ -1,4 +1,3 @@
-import json
 import os
 import time
 import struct
@@ -8,6 +7,7 @@ from sensor_result import SensorResult
 from temperature_sensor import TemperatureSensor
 from weather__data_publisher import WeatherDataPublisher
 from weather_service import WeatherService
+from datetime import datetime, timezone
 
 temperatureSensor = TemperatureSensor()
 ledManager = LedManager()
@@ -19,8 +19,8 @@ CALIBRATION_OFFSET_F = 35.0
 SLEEP_SECONDS = 30
 
 # Future use (multitenancy)
-USER_ID = "e0d5b845-35be-4c25-8b6d-0097664387e2"
-ID = os.getenv("HOSTNAME")
+ACCOUNT_ID = "e0d5b845-35be-4c25-8b6d-0097664387e2"
+DEVICE_ID = os.getenv("HOSTNAME")
 
 # Predefined colors for unicorn hat. It's a gradient that goes from blue (cold) to red (hot)
 HEX_COLORS = ["#0D47A1","#1976D2","#29B6F6","#4DD0E1","#80DEEA","#FFE082","#FFB74D","#FF8A65","#F4511E","#BF360C"]
@@ -59,14 +59,15 @@ def main():
                 ledManager.set_color(color[0], color[1], color[2])
 
                 payload = {
-                    "id": ID,
-                    "user_id": USER_ID,
+                    "device_id": DEVICE_ID,
+                    "account_id": ACCOUNT_ID,
                     "temperature_f": temperature_f,
                     "humidity": sensorResult.humidity,
                     "pressure": sensorResult.pressure,
+                    "timestamp": f"{datetime.now(timezone.utc).isoformat()}"
                 }
 
-                weatherDataPublisher.publish(json.dumps(payload))
+                weatherDataPublisher.publish(payload)
             else:
                 print(f"Error: {sensorResult.errorMessage}")
                 if not sensorResult.isRecoverable:
