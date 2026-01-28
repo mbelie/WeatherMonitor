@@ -14,7 +14,7 @@ class WeatherService:
     PRESSURE_KEY = "surface_pressure"
     
     def __init__(self):
-        self.WEATHER_API_URL = f"https://api.open-meteo.com/v1/forecast?latitude={os.getenv('LATITUDE', self.DEFAULT_LATITUDE)}&longitude={os.getenv('LONGITUDE', self.DEFAULT_LONGITUDE)}{self.WEATHER_API_METRICS}"
+        self.WEATHER_API_URL = f"https://api.open-meteo.com/v1/forecast?latitude={os.getenv('SITE_LATITUDE', self.DEFAULT_LATITUDE)}&longitude={os.getenv('SITE_LONGITUDE', self.DEFAULT_LONGITUDE)}{self.WEATHER_API_METRICS}"
 
     def fetch_conditions(self):
         try:
