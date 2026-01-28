@@ -5,7 +5,12 @@ import os
 
 class WeatherDataPublisher:
     ARN = os.getenv("SNS_ARN")
-    snsClient = boto3.client('sns', region_name='us-west-1')
+    # TODO: Replace with cert
+    ACCESS_KEY = os.getenv("ACCESS_KEY"),
+    SECRET_KEY = os.getenv("SECRET_ACCESS_KEY")
+    REGION = os.getenv("AWS_REGION")
+
+    snsClient = boto3.client('sns', region_name=REGION, aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET_KEY)
 
     def publish(self, payload: Any):
         print(f"Publishing weather data: {payload}")

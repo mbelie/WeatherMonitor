@@ -3,10 +3,11 @@ import boto3
 
 print('Loading function')
 
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('Weather')
+
 # TODO: Replace string literals with constants
 def lambda_handler(event, context):
-    dynamodb = boto3.resource('dynamodb', region_name='us-west-1')
-    table = dynamodb.Table('Weather')
 
     message = event['Records'][0]['Sns']['Message']
 
