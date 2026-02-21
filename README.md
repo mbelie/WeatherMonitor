@@ -1,6 +1,6 @@
 # Weather Monitor
 
-This a hobby project utilizing Raspberry Pi based temperature sensors around my home to capture weather data and commit it to an AWS SNS topic for storage in DynamoDB, alerting via SMS/SES and display in an web dashboard hosted in AWS Amplify.
+A hobby project using Raspberry Pi-based temperature sensors placed around my home to capture weather data. Captured data is published to an AWS SNS topic, which drives storage in DynamoDB, SMS/email alerting via SES, and a live web dashboard hosted on AWS Amplify.
 
 # Architecture
 
