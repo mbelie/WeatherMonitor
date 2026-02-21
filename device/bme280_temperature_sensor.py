@@ -15,7 +15,12 @@ class Bme280TemperatureSensor:
     def __init__(self):
         try:
             self.i2c = board.I2C()
-            self.bme280 = adafruit_bme280.Adafruit_BME280_I2C(self.i2c, address=SENSOR_ADDRESS)
+            try:
+                self.bme280 = adafruit_bme280.Adafruit_BME280_I2C(self.i2c, address=SENSOR_ADDRESS)
+            except Exception:
+                self.i2c.deinit()
+                raise
+        
         except Exception as e:
             logger.error(f"Failed to initialize BME280 sensor: {e}")
             raise
@@ -35,7 +40,7 @@ class Bme280TemperatureSensor:
         except Exception as error:
             return SensorResult(errorMessage=f"Error reading temperature: {error}", isRecoverable=True, temperatureUnit=None)
 
-    def dispose(self):
+    def dispose(self) -> None:
         """Clean up I2C resources."""
         try:
             if hasattr(self, 'i2c') and self.i2c:
