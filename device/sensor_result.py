@@ -43,7 +43,8 @@ class SensorResult:
         """Return user-friendly string representation."""
         if self.has_error:
             return f"Error: {self.errorMessage}"
-        return f"Temp: {self.temperature}°{self.temperatureUnit.name[0]}, Humidity: {self.humidity}%, Pressure: {self.pressure}"
+        unit_str = self.temperatureUnit.name[0] if self.temperatureUnit else "?"
+        return f"Temp: {self.temperature}°{unit_str}, Humidity: {self.humidity}%, Pressure: {self.pressure}"
 
     @property
     def has_error(self) -> bool:
