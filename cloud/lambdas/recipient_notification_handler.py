@@ -1,25 +1,34 @@
 import json
 import boto3
+import logging
+import os
+logger = logging.getLogger()
 
-print('Loading function')
+logger.info('Loading function')
 
-# TODO: Move to environment variables
-PHONE = '+17778889999'
-TEMPERATURE_MAX = 100.0
-TEMPERATURE_MIN = 40.0
+PHONE = os.getenv('ALERT_PHONE_NUMBER')
+TEMPERATURE_MAX = float(os.getenv('TEMPERATURE_MAX', '100.0'))
+TEMPERATURE_MIN = float(os.getenv('TEMPERATURE_MIN', '40.0'))
 
 def lambda_handler(event, context):
     message = event['Records'][0]['Sns']['Message']
 
-    # print goes to CloudWatch so does the built in logger
-    print(f"Received message: {message}")
+    # logger.info goes to CloudWatch so does the built in logger
+    logger.info(f"Received message: {message}")
     
-    data = json.loads(message)
-    temperature = float(data["temperature_f"])
-    print(f"Temperature: {temperature}°F")
+    try:
+        data = json.loads(message)
+        temperature = float(data.get("temperature_f"))
+        if temperature is None:
+            raise ValueError("Missing temperature_f field")
+    except (json.JSONDecodeError, ValueError, KeyError) as e:
+        logger.error(f"Error processing message: {e}")
+        return {'statusCode': 400, 'body': json.dumps('Invalid message')}
+
+    logger.info(f"Temperature: {temperature}°F")
 
     if temperature <= TEMPERATURE_MIN or temperature >= TEMPERATURE_MAX:
-        print("Temperature out of range!")
+        logger.info("Temperature out of range!")
         sns = boto3.client('sns')
 
         # TODO: SMS requires setup
@@ -31,5 +40,5 @@ def lambda_handler(event, context):
 
         # TODO: Add email notification
     
-    print("Temperature within range")
+    logger.info("Temperature within range")
     return {'statusCode': 200, 'body': json.dumps('Temperature within range')}
