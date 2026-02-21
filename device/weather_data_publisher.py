@@ -13,6 +13,9 @@ class WeatherDataPublisher:
     snsClient = boto3.client('sns', region_name=REGION, aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET_KEY)
 
     def publish(self, payload: Any):
-        print(f"Publishing weather data: {payload}")
-        response = self.snsClient.publish(TopicArn=self.ARN, Message=json.dumps(payload))
-        print(f"SNS publish response: {response}")
+        try:
+            print(f"Publishing weather data: {payload}")
+            response = self.snsClient.publish(TopicArn=self.ARN, Message=json.dumps(payload))
+            print(f"SNS publish response: {response}")
+        except Exception as error:
+            print(f"Error publishing weather data: {error}")

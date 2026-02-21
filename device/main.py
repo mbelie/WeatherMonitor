@@ -1,85 +1,36 @@
+import json
+import logging
 import os
-import time
-import struct
-
-from led_manager import LedManager
-from sensor_result import SensorResult
-from temperature_sensor import TemperatureSensor
-from weather__data_publisher import WeatherDataPublisher
-from weather_service import WeatherService
 from datetime import datetime, timezone
+import boto3
 
-temperatureSensor = TemperatureSensor()
-ledManager = LedManager()
-weatherService = WeatherService()
-weatherDataPublisher = WeatherDataPublisher()
+# Region, access key and secret access key come from AWS configuration
+snsClient = boto3.client('sns')
+logger = logging.getLogger(__name__)
 
-#  Old DHT11 sensors?
-CALIBRATION_OFFSET_F = 35.0
-SLEEP_SECONDS = 30
+try:
+   # Test payload
+   payload = {
+        "device_id": 1,
+        "account_id": 2,
+        "temperature_f": 39,
+        "humidity": 50,
+        "pressure": 1000,
+        "timestamp": f"{datetime.now(timezone.utc).isoformat()}"
+    }
+   
+   arn = os.getenv('SNS_ARN')
 
-# Future use (multitenancy)
-ACCOUNT_ID = "e0d5b845-35be-4c25-8b6d-0097664387e2"
-DEVICE_ID = os.getenv("HOSTNAME")
+   if not arn:
+         raise ValueError("SNS_ARN environment variable is not set.")
+   
+   arn = arn.strip()
 
-# Predefined colors for unicorn hat. It's a gradient that goes from blue (cold) to red (hot)
-HEX_COLORS = ["#0D47A1","#1976D2","#29B6F6","#4DD0E1","#80DEEA","#FFE082","#FFB74D","#FF8A65","#F4511E","#BF360C"]
-COLORS = []
+   logger.info(f"Publishing weather data: {payload}...")
 
-def setup_colors():
-    for index in range(len(HEX_COLORS)):
-        COLORS.append(hex_to_rgb(HEX_COLORS[index]))
+   response = snsClient.publish(TopicArn=arn, Message=json.dumps(payload))
+   
+   logger.info(f"SNS publish response: {response}")
 
-def hex_to_rgb(hex_color):
-    hex_color = hex_color.lstrip('#')
-    return struct.unpack('BBB', bytes.fromhex(hex_color))
-
-def setup():
-    setup_colors()
-    ledManager.initialize()
-
-def main():
-    try:
-        setup()
-        
-        while True:
-            temperature_f = 0.0
-            sensorResult = temperatureSensor.read()
-
-            if (sensorResult.errorMessage is None):
-                temperature_f = sensorResult.to_fahrenheit()
-            else:
-                sensorResult = weatherService.fetch_conditions()
-                temperature_f = sensorResult.temperature
-
-            if sensorResult.errorMessage is None:
-                print(f"Temperature: {temperature_f:.1f} F  Humidity: {sensorResult.humidity:.1f}%")
-
-                color = COLORS[min(max(0, int(temperature_f // 10)), len(COLORS) - 1)]
-                ledManager.set_color(color[0], color[1], color[2])
-
-                payload = {
-                    "device_id": DEVICE_ID,
-                    "account_id": ACCOUNT_ID,
-                    "temperature_f": temperature_f,
-                    "humidity": sensorResult.humidity,
-                    "pressure": sensorResult.pressure,
-                    "timestamp": f"{datetime.now(timezone.utc).isoformat()}"
-                }
-
-                weatherDataPublisher.publish(payload)
-            else:
-                print(f"Error: {sensorResult.errorMessage}")
-                if not sensorResult.isRecoverable:
-                    temperatureSensor.dispose()
-                    raise SystemExit("Unrecoverable error encountered. Exiting.")
-
-            print(f"Sleeping {SLEEP_SECONDS}s...")
-            time.sleep(SLEEP_SECONDS)
-    except KeyboardInterrupt:
-        print("\nExiting program...")
-    finally:
-        temperatureSensor.dispose()
-
-if __name__ == "__main__":
-    main()
+except Exception as error:
+    logger.info(f"Error publishing weather data: {error}")

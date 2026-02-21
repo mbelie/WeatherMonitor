@@ -3,7 +3,7 @@ import adafruit_dht
 from sensor_result import SensorResult
 from enums import TemperatureUnit
 
-class TemperatureSensor:
+class Dht11TemperatureSensor:
     def __init__(self):
         self.dht_device = adafruit_dht.DHT11(board.D4)
 
