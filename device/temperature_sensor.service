@@ -1,12 +1,12 @@
 [Unit]
-Description=DHT11 Temperature and Humidity Sensor Reader
+Description=Temperature and Humidity Sensor Reader Service
 After=network.target
 
 [Service]
 Type=simple
-User=mbelie
-WorkingDirectory=/home/mbelie
-ExecStart=/home/mbelie/projects/temperarture-sensor/bin/python3 /home/mbelie/projects/temperarture-sensor/main.py
+User=TBD
+WorkingDirectory=TBD
+ExecStart=TBD
 Restart=on-failure
 RestartSec=10
 StandardOutput=journal
