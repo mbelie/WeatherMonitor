@@ -45,7 +45,7 @@ def setup() -> None:
 
 def main() -> None:
     try:
-        setup()
+        # setup()
         
         while True:
             sensorResult = temperatureSensor.read()
@@ -65,9 +65,9 @@ def main() -> None:
                 
                 # Map temperature to color: each 10°F increment corresponds to one color
                 # Using / instead of // to handle negative temperatures correctly
-                color_index = max(0, min(int(temperature / 10), len(COLORS) - 1))
-                color = COLORS[color_index]
-                ledManager.set_color(color[0], color[1], color[2])
+                #color_index = max(0, min(int(temperature / 10), len(COLORS) - 1))
+                #color = COLORS[color_index]
+                #ledManager.set_color(color[0], color[1], color[2])
 
                 payload = {
                     "device_id": DEVICE_ID,

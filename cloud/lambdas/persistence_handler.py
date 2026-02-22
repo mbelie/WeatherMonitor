@@ -1,20 +1,16 @@
 import json
+from unicodedata import decimal
 import boto3
 import logging
+from decimal import Decimal
 
-TABLE_NAME = 'Weather'
-
+TABLE_NAME = 'Weather2'
 logger = logging.getLogger()
-
-logger.info('Loading function')
-
 dynamodb = boto3.resource('dynamodb')
-
 table = dynamodb.Table(TABLE_NAME)
 
 # TODO: Replace string literals with constants
 def lambda_handler(event, context):
-
     message = event['Records'][0]['Sns']['Message']
 
     # logger.info goes to CloudWatch so does the built in logger
@@ -23,9 +19,9 @@ def lambda_handler(event, context):
     try:
         data = json.loads(message)
         
-        temperature = float(data["temperature_f"])
-        humidity = float(data["humidity"])
-        pressure = float(data["pressure"])
+        temperature = Decimal(data["temperature_f"])
+        humidity = Decimal(data["humidity"])
+        pressure = Decimal(data["pressure"])
         deviceId = data["device_id"]
         accountId = data["account_id"]
         timestamp = data["timestamp"]
