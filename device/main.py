@@ -3,17 +3,19 @@ import os
 import time
 import struct
 
-from bme280_temperature_sensor import Bme280TemperatureSensor
+#from senesors.bme280_temperature_sensor import Bme280TemperatureSensor
+from sensors.dummy_temperature_sensor import DummyTemperatureSensor
 from enums import TemperatureUnit
-from led_manager import LedManager
+#from led_manager import LedManager
 from sensor_result import SensorResult
 from weather_data_publisher import WeatherDataPublisher
 from weather_service import WeatherService
 from datetime import datetime, timezone
 from typing import Tuple
 
-temperatureSensor = Bme280TemperatureSensor()
-ledManager = LedManager()
+#temperatureSensor = Bme280TemperatureSensor()
+temperatureSensor = DummyTemperatureSensor()
+#ledManager = LedManager()
 weatherService = WeatherService()
 weatherDataPublisher = WeatherDataPublisher()
 
@@ -25,6 +27,7 @@ COLORS = []
 # Future use (multi-tenancy)
 ACCOUNT_ID = "e0d5b845-35be-4c25-8b6d-0097664387e2"
 DEVICE_ID = os.getenv("HOSTNAME")
+SLEEP_SECONDS = 60 * 60
 
 # Validate required environment variables
 if not DEVICE_ID:
@@ -41,12 +44,11 @@ def hex_to_rgb(hex_color: str) -> Tuple[int, int, int]:
 
 def setup() -> None:
     setup_colors()
-    ledManager.initialize()
+    #ledManager.initialize()
 
 def main() -> None:
+    # setup()
     try:
-        # setup()
-        
         while True:
             sensorResult = temperatureSensor.read()
 

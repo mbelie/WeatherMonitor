@@ -1,5 +1,6 @@
 import board
-import adafruit_bme280
+#import adafruit_bme280
+from adafruit_bme280 import basic as adafruit_bme280 
 import logging
 
 from sensor_result import SensorResult

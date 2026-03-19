@@ -15,6 +15,8 @@ class WeatherDataPublisher:
         """Initialize the publisher with validated environment variables."""
         self.arn = os.getenv("SNS_ARN")
         self.region = os.getenv("AWS_REGION")
+
+        logger.info(f"Initializing WeatherDataPublisher with SNS_ARN: {self.arn}, AWS_REGION: {self.region}")
         
         # Validate required environment variables
         missing_vars = []
